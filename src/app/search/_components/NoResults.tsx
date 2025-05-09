@@ -19,7 +19,7 @@ export default function NoResults() {
       </h3>
       <p className="mb-6 text-center text-gray-600">
         We couldn&apos;t find any recipes that match{" "}
-        <span className="font-semibold">"{query}"</span>
+        <span className="font-semibold">&ldquo;{query}&rdquo;</span>
         <br />
         Try using different keywords or browsing by category.
       </p>

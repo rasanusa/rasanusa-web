@@ -49,7 +49,7 @@ export default function FilterBar() {
         <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuRadioGroup
             value={currentCategory}
-            onValueChange={(value) => updateFilter("category", value)}
+            onValueChange={(value: string) => updateFilter("category", value)}
           >
             <DropdownMenuRadioItem value="" className="cursor-pointer">
               All Categories
@@ -91,7 +91,7 @@ export default function FilterBar() {
         <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuRadioGroup
             value={currentSort}
-            onValueChange={(value) => updateFilter("sort", value)}
+            onValueChange={(value: string) => updateFilter("sort", value)}
           >
             <DropdownMenuRadioItem value="loves" className="cursor-pointer">
               Most Popular
