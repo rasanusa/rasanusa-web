@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import axios, { type AxiosError } from "axios";
+import https from "https";
 
 interface SearchResult {
   hits?: {
@@ -68,6 +69,10 @@ export const searchRouter = createTRPCRouter({
           },
         };
 
+        const httpsAgent = new https.Agent({
+          rejectUnauthorized: false,
+        });
+
         const response = await axios({
           method: "post",
           url: `${process.env.ELASTIC_SEARCH_URL}?filter_path=hits.total.value,hits.hits._source`,
@@ -78,6 +83,7 @@ export const searchRouter = createTRPCRouter({
               `${process.env.ELASTIC_USERNAME}:${process.env.ELASTIC_PASSWORD}`,
             ).toString("base64")}`,
           },
+          httpsAgent,
         });
 
         const data = response.data as SearchResult;
