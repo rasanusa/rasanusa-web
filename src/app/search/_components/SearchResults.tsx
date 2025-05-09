@@ -32,9 +32,7 @@ export default function SearchResults({
     {
       // Only run query if we have a search term
       enabled: !!query,
-      // Keep previous data while loading new data
-      keepPreviousData: true,
-    }
+    },
   );
 
   // Refetch when search parameters change
@@ -64,7 +62,9 @@ export default function SearchResults({
         <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
           <span className="text-2xl">❌</span>
         </div>
-        <h3 className="mb-2 text-xl font-semibold text-red-800">Search Error</h3>
+        <h3 className="mb-2 text-xl font-semibold text-red-800">
+          Search Error
+        </h3>
         <p className="text-red-600">{error.message}</p>
         <button
           onClick={() => refetch()}
@@ -87,11 +87,13 @@ export default function SearchResults({
       <div className="flex flex-col items-start justify-between gap-4 rounded-xl bg-white p-4 shadow-sm sm:flex-row sm:items-center">
         <div>
           <p className="text-orange-800">
-            Found <span className="font-bold text-orange-900">{data.total}</span> recipes
+            Found{" "}
+            <span className="font-bold text-orange-900">{data.total}</span>{" "}
+            recipes
             {query ? ` matching "${query}"` : ""}
           </p>
         </div>
-        
+
         <FilterBar />
       </div>
 

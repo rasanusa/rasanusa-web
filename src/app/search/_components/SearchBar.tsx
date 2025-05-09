@@ -34,7 +34,7 @@ export default function SearchBar({ defaultValue = "" }) {
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         placeholder="Search for Indonesian recipes..."
-        className="w-full rounded-full py-6 pr-12 pl-6 text-lg shadow-lg focus:ring-2 focus:ring-yellow-500"
+        className="w-full rounded-full bg-amber-50 py-6 pr-12 pl-6 text-lg shadow-lg focus:ring-2 focus:ring-yellow-500"
       />
       <Button
         type="submit"

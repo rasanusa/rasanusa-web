@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { HydrateClient } from "@/trpc/server";
-import Image from "next/image";
 
 export default async function Home() {
   return (
@@ -13,28 +12,6 @@ export default async function Home() {
           <div className="absolute inset-0 overflow-hidden">
             <div className="absolute -top-[10%] -right-[10%] h-[40%] w-[40%] rounded-full bg-gradient-to-br from-amber-200/40 to-orange-300/40 blur-3xl"></div>
             <div className="absolute -bottom-[10%] -left-[10%] h-[40%] w-[40%] rounded-full bg-gradient-to-tr from-orange-200/40 to-amber-300/40 blur-3xl"></div>
-          </div>
-
-          {/* Floating food elements (subtle) */}
-          <div className="pointer-events-none absolute hidden md:block">
-            <div className="absolute top-1/3 right-[10%] rotate-6">
-              <Image
-                src="/images/rendang.jpg"
-                alt="Rendang"
-                width={140}
-                height={140}
-                className="rounded-xl opacity-80 shadow-lg"
-              />
-            </div>
-            <div className="absolute bottom-1/3 left-[10%] -rotate-6">
-              <Image
-                src="/images/nasi-goreng.jpg"
-                alt="Nasi Goreng"
-                width={140}
-                height={140}
-                className="rounded-xl opacity-80 shadow-lg"
-              />
-            </div>
           </div>
 
           {/* Main content with search */}
@@ -56,7 +33,7 @@ export default async function Home() {
                       type="text"
                       name="q"
                       placeholder="Search for Indonesian recipes..."
-                      className="w-full border-none bg-white px-6 py-5 text-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                      className="w-full border-none bg-white px-6 py-4 text-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
                       aria-label="Search recipes"
                     />
                     <button
@@ -65,7 +42,6 @@ export default async function Home() {
                       aria-label="Search"
                     >
                       <Search size={20} className="mr-1" />
-                      <span className="hidden sm:inline">Search</span>
                     </button>
                   </div>
                 </form>

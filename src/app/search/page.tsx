@@ -2,16 +2,25 @@ import { HydrateClient } from "@/trpc/server";
 import SearchResults from "./_components/SearchResults";
 import SearchBar from "./_components/SearchBar";
 import { ChefHat } from "lucide-react";
+import { type Metadata } from "next";
 
-export default async function SearchPage({
-  searchParams,
-}: {
-  searchParams: {
-    q?: string;
-    category?: string;
-    page?: string;
-  };
-}) {
+type SearchParams = {
+  q?: string;
+  category?: string;
+  page?: string;
+};
+
+type Props = {
+  searchParams: SearchParams;
+};
+
+// Optional: Add metadata
+export const metadata: Metadata = {
+  title: "Search Recipes - RasaNusa",
+  description: "Search for authentic Indonesian recipes",
+};
+
+export default function SearchPage({ searchParams }: Props) {
   const query = searchParams?.q ?? "";
 
   return (
