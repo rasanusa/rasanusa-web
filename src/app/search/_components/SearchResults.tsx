@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use client";
 
 import { useEffect } from "react";
@@ -32,13 +28,6 @@ export default function SearchResults() {
       enabled: !!query,
     },
   );
-
-  // Refetch when search parameters change
-  useEffect(() => {
-    if (query) {
-      refetch();
-    }
-  }, [query, currentPage, categoryFilter, refetch]);
 
   // Calculate total pages
   const totalPages = data ? Math.ceil(data.total / data.limit) : 0;
