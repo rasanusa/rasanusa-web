@@ -9,15 +9,9 @@ import NoResults from "./NoResults";
 import FilterBar from "./FilterBar";
 import { Loader2 } from "lucide-react";
 
-interface SearchResultsProps {
-  initialQuery?: string;
-}
-
-export default function SearchResults({
-  initialQuery = "",
-}: SearchResultsProps) {
+export default function SearchResults() {
   const searchParams = useSearchParams();
-  const query = searchParams.get("q") ?? initialQuery;
+  const query = searchParams.get("q") ?? "";
   const pageParam = searchParams.get("page");
   const currentPage = pageParam ? parseInt(pageParam, 10) : 1;
   const categoryFilter = searchParams.get("category") ?? "";
@@ -78,7 +72,7 @@ export default function SearchResults({
 
   // No results state
   if (!data?.results.length) {
-    return <NoResults query={query} />;
+    return <NoResults />;
   }
 
   return (
