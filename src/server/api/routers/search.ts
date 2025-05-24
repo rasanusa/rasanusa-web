@@ -230,6 +230,119 @@ Tips:`,
       }
     }),
 
+  // Translate ingredients to English
+  translateIngredients: publicProcedure
+    .input(
+      z.object({
+        ingredients: z.string(),
+        title: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      try {
+        const response = await axios.post(
+          "https://api-inference.huggingface.co/models/meta-llama/Llama-3.1-8B-Instruct",
+          {
+            inputs: `Translate the following Indonesian recipe ingredients to English. Keep the measurements accurate and translate ingredient names properly. Output ONLY the translated ingredients, maintaining the exact same format with '--' separators. Do not add explanations, notes, or additional text.
+
+Indonesian Ingredients:
+${input.ingredients.substring(0, 1000)}
+
+English Translation:`,
+            parameters: {
+              max_new_tokens: 400,
+              temperature: 0.3,
+              do_sample: true,
+            },
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.HF_TOKEN}`,
+              "Content-Type": "application/json",
+            },
+          },
+        );
+
+        const data = response.data as LLMResponse;
+        let translatedIngredients = "";
+
+        if (Array.isArray(data) && data[0]?.generated_text) {
+          const generatedText = data[0].generated_text;
+          const translatedPart = generatedText
+            .split("English Translation:")[1]
+            ?.trim();
+          if (translatedPart) {
+            translatedIngredients = translatedPart;
+          }
+        }
+
+        return {
+          ingredients: translatedIngredients || "Translation unavailable",
+        };
+      } catch (error) {
+        console.error("Ingredients translation error:", error);
+        return {
+          ingredients: "Translation unavailable",
+        };
+      }
+    }),
+
+  // Translate steps to English
+  translateSteps: publicProcedure
+    .input(
+      z.object({
+        steps: z.string(),
+        title: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      try {
+        const response = await axios.post(
+          "https://api-inference.huggingface.co/models/meta-llama/Llama-3.1-8B-Instruct",
+          {
+            inputs: `Translate the following Indonesian recipe cooking steps to English. Keep the instructions clear and maintain the cooking order. Each step should be on a new line. Output ONLY the translated cooking steps, one per line. Do not add explanations, cooking tips, notes, or any additional commentary.
+
+Indonesian Steps:
+${input.steps.substring(0, 1000)}
+
+English Translation:`,
+            parameters: {
+              temperature: 0.3,
+              do_sample: true,
+            },
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.HF_TOKEN}`,
+              "Content-Type": "application/json",
+            },
+          },
+        );
+
+        const data = response.data as LLMResponse;
+        let translatedSteps = "";
+
+        if (Array.isArray(data) && data[0]?.generated_text) {
+          const generatedText = data[0].generated_text;
+          const translatedPart = generatedText
+            .split("English Translation:")[1]
+            ?.trim();
+          if (translatedPart) {
+            translatedSteps = translatedPart;
+          }
+        }
+
+        return {
+          steps: translatedSteps || "Translation unavailable",
+        };
+      } catch (error) {
+        console.error("Steps translation error:", error);
+        return {
+          steps: "Translation unavailable",
+        };
+      }
+    }),
+
   // Get single recipe by document ID
   getRecipe: publicProcedure
     .input(z.object({ id: z.string() }))

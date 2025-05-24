@@ -11,6 +11,7 @@ import {
   Sparkles,
   Lightbulb,
   Loader2,
+  Languages,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,12 +27,19 @@ export default function RecipeDetailContent({
   recipeId,
 }: RecipeDetailContentProps) {
   const [showAIFeatures, setShowAIFeatures] = useState(false);
+  const [showIngredientsTranslation, setShowIngredientsTranslation] =
+    useState(false);
+  const [showStepsTranslation, setShowStepsTranslation] = useState(false);
   const [aiData, setAiData] = useState<{
     summary?: string;
     tips?: string;
   }>({});
+  const [translationData, setTranslationData] = useState<{
+    ingredients?: string;
+    steps?: string;
+  }>({});
 
-  // Fetch recipe details by ID with proper typing
+  // Fetch recipe details by ID
   const recipeQuery = api.search.getRecipe.useQuery(
     { id: recipeId },
     { enabled: !!recipeId },
@@ -39,17 +47,33 @@ export default function RecipeDetailContent({
 
   const { data: recipe, isLoading, error } = recipeQuery;
 
-  // AI summary mutation
+  // AI mutations
   const summaryMutation = api.search.generateRecipeSummary.useMutation({
     onSuccess: (data) => {
       setAiData((prev) => ({ ...prev, summary: data.summary }));
     },
   });
 
-  // AI tips mutation
   const tipsMutation = api.search.generateCookingTips.useMutation({
     onSuccess: (data) => {
       setAiData((prev) => ({ ...prev, tips: data.tips }));
+    },
+  });
+
+  // Translation mutations
+  const translateIngredientsMutation =
+    api.search.translateIngredients.useMutation({
+      onSuccess: (data) => {
+        setTranslationData((prev) => ({
+          ...prev,
+          ingredients: data.ingredients,
+        }));
+      },
+    });
+
+  const translateStepsMutation = api.search.translateSteps.useMutation({
+    onSuccess: (data) => {
+      setTranslationData((prev) => ({ ...prev, steps: data.steps }));
     },
   });
 
@@ -76,6 +100,39 @@ export default function RecipeDetailContent({
       }
     } else {
       setShowAIFeatures(false);
+    }
+  };
+
+  const handleIngredientsTranslation = () => {
+    if (!showIngredientsTranslation && recipe) {
+      setShowIngredientsTranslation(true);
+
+      if (
+        !translationData.ingredients &&
+        !translateIngredientsMutation.isPending
+      ) {
+        translateIngredientsMutation.mutate({
+          ingredients: recipe.ingredients,
+          title: recipe.title,
+        });
+      }
+    } else {
+      setShowIngredientsTranslation(false);
+    }
+  };
+
+  const handleStepsTranslation = () => {
+    if (!showStepsTranslation && recipe) {
+      setShowStepsTranslation(true);
+
+      if (!translationData.steps && !translateStepsMutation.isPending) {
+        translateStepsMutation.mutate({
+          steps: recipe.steps,
+          title: recipe.title,
+        });
+      }
+    } else {
+      setShowStepsTranslation(false);
     }
   };
 
@@ -124,7 +181,24 @@ export default function RecipeDetailContent({
     .split("--")
     .map((item) => item.trim())
     .filter((item) => item.length > 0);
+
   const stepsList = recipe.steps.split("\n").filter((step) => step.trim());
+
+  // Parse translated content with restriction to original count
+  const translatedIngredientsList = translationData.ingredients
+    ? translationData.ingredients
+        .split("--")
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0)
+        .slice(0, ingredientsList.length) // Restrict to original count
+    : [];
+
+  const translatedStepsList = translationData.steps
+    ? translationData.steps
+        .split("\n")
+        .filter((step) => step.trim())
+        .slice(0, stepsList.length) // Restrict to original count
+    : [];
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50/30">
@@ -296,17 +370,70 @@ export default function RecipeDetailContent({
                 <CardTitle className="flex items-center gap-2">
                   <ChefHat className="text-orange-500" size={24} />
                   Ingredients
+                  {showIngredientsTranslation && (
+                    <Badge variant="outline" className="ml-2 text-blue-600">
+                      English
+                    </Badge>
+                  )}
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {ingredientsList.map((ingredient, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-orange-400" />
-                      <span className="text-gray-700">{ingredient}</span>
-                    </li>
-                  ))}
-                </ul>
+              <CardContent className="space-y-4">
+                {/* Ingredients List */}
+                {showIngredientsTranslation &&
+                translatedIngredientsList.length > 0 ? (
+                  <ul className="space-y-2">
+                    {translatedIngredientsList.map((ingredient, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-blue-400" />
+                        <span className="text-gray-700">{ingredient}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : showIngredientsTranslation &&
+                  translateIngredientsMutation.isPending ? (
+                  <div className="space-y-2">
+                    {ingredientsList.map((_, index) => (
+                      <div key={index} className="flex items-start gap-2">
+                        <div className="mt-2 h-2 w-2 flex-shrink-0 animate-pulse rounded-full bg-blue-200" />
+                        <div className="h-4 w-full animate-pulse rounded bg-blue-200" />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <ul className="space-y-2">
+                    {ingredientsList.map((ingredient, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-orange-400" />
+                        <span className="text-gray-700">{ingredient}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {/* Translation Button */}
+                <div className="border-t pt-4">
+                  <Button
+                    onClick={handleIngredientsTranslation}
+                    variant="outline"
+                    size="sm"
+                    disabled={translateIngredientsMutation.isPending}
+                    className="w-full text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                  >
+                    {translateIngredientsMutation.isPending ? (
+                      <>
+                        <Loader2 size={16} className="mr-2 animate-spin" />
+                        Translating...
+                      </>
+                    ) : (
+                      <>
+                        <Languages size={16} className="mr-2" />
+                        {showIngredientsTranslation
+                          ? "Show Indonesian"
+                          : "Translate to English"}
+                      </>
+                    )}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
@@ -316,21 +443,79 @@ export default function RecipeDetailContent({
                 <CardTitle className="flex items-center gap-2">
                   <Clock className="text-orange-500" size={24} />
                   Instructions
+                  {showStepsTranslation && (
+                    <Badge variant="outline" className="ml-2 text-blue-600">
+                      English
+                    </Badge>
+                  )}
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <ol className="space-y-4">
-                  {stepsList.map((step, index) => (
-                    <li key={index} className="flex gap-3">
-                      <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-orange-100 text-sm font-bold text-orange-600">
-                        {index + 1}
-                      </span>
-                      <span className="leading-relaxed text-gray-700">
-                        {step}
-                      </span>
-                    </li>
-                  ))}
-                </ol>
+              <CardContent className="space-y-4">
+                {/* Steps List */}
+                {showStepsTranslation && translatedStepsList.length > 0 ? (
+                  <ol className="space-y-4">
+                    {translatedStepsList.map((step, index) => (
+                      <li key={index} className="flex gap-3">
+                        <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600">
+                          {index + 1}
+                        </span>
+                        <span className="leading-relaxed text-gray-700">
+                          {step}
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                ) : showStepsTranslation && translateStepsMutation.isPending ? (
+                  <div className="space-y-4">
+                    {stepsList.map((_, index) => (
+                      <div key={index} className="flex gap-3">
+                        <div className="h-6 w-6 animate-pulse rounded-full bg-blue-200" />
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 animate-pulse rounded bg-blue-200" />
+                          <div className="h-4 w-3/4 animate-pulse rounded bg-blue-200" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <ol className="space-y-4">
+                    {stepsList.map((step, index) => (
+                      <li key={index} className="flex gap-3">
+                        <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-orange-100 text-sm font-bold text-orange-600">
+                          {index + 1}
+                        </span>
+                        <span className="leading-relaxed text-gray-700">
+                          {step}
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+
+                {/* Translation Button */}
+                <div className="border-t pt-4">
+                  <Button
+                    onClick={handleStepsTranslation}
+                    variant="outline"
+                    size="sm"
+                    disabled={translateStepsMutation.isPending}
+                    className="w-full text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                  >
+                    {translateStepsMutation.isPending ? (
+                      <>
+                        <Loader2 size={16} className="mr-2 animate-spin" />
+                        Translating...
+                      </>
+                    ) : (
+                      <>
+                        <Languages size={16} className="mr-2" />
+                        {showStepsTranslation
+                          ? "Show Indonesian"
+                          : "Translate to English"}
+                      </>
+                    )}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>
