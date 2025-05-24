@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { ChefHat } from "lucide-react";
 import SearchBar from "./SearchBar";
 import SearchResults from "./SearchResults";
+import Link from "next/link";
 
 export default function SearchPageContent() {
   const searchParams = useSearchParams();
@@ -21,7 +22,9 @@ export default function SearchPageContent() {
 
         <div className="relative container mx-auto px-4">
           <div className="mb-8 flex flex-col items-center justify-center gap-2 sm:flex-row">
-            <ChefHat size={32} className="text-yellow-300" />
+            <Link href="/">
+              <ChefHat size={32} className="text-yellow-300" />
+            </Link>
             <h1 className="text-center text-3xl font-bold text-white">
               {query ? `Recipes with "${query}"` : "Browse All Recipes"}
             </h1>

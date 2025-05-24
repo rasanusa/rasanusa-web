@@ -42,7 +42,11 @@ export default function Pagination({
           key={i}
           variant={i === currentPage ? "default" : "outline"}
           onClick={() => handlePageChange(i)}
-          className="h-10 w-10"
+          className={
+            i === currentPage
+              ? "h-10 w-10 border-0 bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-md hover:from-amber-700 hover:to-orange-700"
+              : "h-10 w-10 border-amber-200 text-amber-700 hover:border-amber-300 hover:bg-amber-50 hover:text-amber-800"
+          }
         >
           {i}
         </Button>,
@@ -57,7 +61,7 @@ export default function Pagination({
         variant="outline"
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="h-10 w-10 p-0"
+        className="h-10 w-10 border-amber-200 p-0 text-amber-700 hover:border-amber-300 hover:bg-amber-50 hover:text-amber-800 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-amber-700"
       >
         <ChevronLeft className="h-4 w-4" />
       </Button>
@@ -68,7 +72,7 @@ export default function Pagination({
         variant="outline"
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="h-10 w-10 p-0"
+        className="h-10 w-10 border-amber-200 p-0 text-amber-700 hover:border-amber-300 hover:bg-amber-50 hover:text-amber-800 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-amber-700"
       >
         <ChevronRight className="h-4 w-4" />
       </Button>

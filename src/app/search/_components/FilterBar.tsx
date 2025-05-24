@@ -1,134 +1,95 @@
 "use client";
 
+import React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronDown } from "lucide-react";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+const RECIPE_CATEGORIES = [
+  "udang", // Shrimp
+  "tempe", // Tempeh
+  "sapi", // Beef
+  "telur", // Egg
+  "kambing", // Goat
+  "ikan", // Fish
+  "ayam", // Chicken
+  "tahu", // Tofu
+];
+
+const CATEGORY_NAMES: Record<string, string> = {
+  ayam: "Chicken",
+  ikan: "Fish",
+  sapi: "Beef",
+  udang: "Shrimp",
+  telur: "Egg",
+  tahu: "Tofu",
+  tempe: "Tempeh",
+  kambing: "Goat",
+};
 
 export default function FilterBar() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentCategory = searchParams.get("category") ?? "";
-  const currentSort = searchParams.get("sort") ?? "loves";
 
-  const updateFilter = (param: string, value: string) => {
+  const handleCategoryChange = (category: string) => {
     const params = new URLSearchParams(searchParams.toString());
-
-    if (value) {
-      params.set(param, value);
+    if (category === "all") {
+      params.delete("category");
     } else {
-      params.delete(param);
+      params.set("category", category);
     }
-
-    // Reset to page 1
     params.set("page", "1");
+    router.push(`/search?${params.toString()}`);
+  };
 
+  const clearFilters = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("category");
+    params.set("page", "1");
     router.push(`/search?${params.toString()}`);
   };
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {/* Category filter */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-1 border-orange-200 text-orange-800 hover:bg-orange-50"
-          >
-            Category
-            <ChevronDown size={16} />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuRadioGroup
-            value={currentCategory}
-            onValueChange={(value: string) => updateFilter("category", value)}
-          >
-            <DropdownMenuRadioItem value="" className="cursor-pointer">
-              All Categories
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem
-              value="Main Course"
-              className="cursor-pointer"
-            >
-              Main Course
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="Breakfast" className="cursor-pointer">
-              Breakfast
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="Dessert" className="cursor-pointer">
-              Dessert
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="Soup" className="cursor-pointer">
-              Soup
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="Snack" className="cursor-pointer">
-              Snack
-            </DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
+        <Filter size={16} className="text-gray-500" />
+        <span className="text-sm text-gray-600">Filter by:</span>
+      </div>
 
-      {/* Sort filter */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-1 border-orange-200 text-orange-800 hover:bg-orange-50"
-          >
-            Sort by
-            <ChevronDown size={16} />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuRadioGroup
-            value={currentSort}
-            onValueChange={(value: string) => updateFilter("sort", value)}
-          >
-            <DropdownMenuRadioItem value="loves" className="cursor-pointer">
-              Most Popular
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="title" className="cursor-pointer">
-              Alphabetical (A-Z)
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem
-              value="total_ingredients"
-              className="cursor-pointer"
-            >
-              Fewest Ingredients
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem
-              value="total_steps"
-              className="cursor-pointer"
-            >
-              Fewest Steps
-            </DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <Select
+        value={currentCategory || "all"}
+        onValueChange={handleCategoryChange}
+      >
+        <SelectTrigger className="w-40">
+          <SelectValue placeholder="Category" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Categories</SelectItem>
+          {RECIPE_CATEGORIES.map((category) => (
+            <SelectItem key={category} value={category}>
+              {CATEGORY_NAMES[category] ?? category}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-      {/* Clear filters button - only show if filters are active */}
-      {(currentCategory || currentSort !== "loves") && (
+      {currentCategory && (
         <Button
+          onClick={clearFilters}
           variant="ghost"
           size="sm"
-          className="text-xs text-orange-700 hover:bg-orange-50"
-          onClick={() => {
-            const params = new URLSearchParams(searchParams.toString());
-            params.delete("category");
-            params.delete("sort");
-            router.push(`/search?${params.toString()}`);
-          }}
+          className="text-gray-500 hover:text-gray-700"
         >
-          Clear filters
+          <X size={14} className="mr-1" />
+          Clear
         </Button>
       )}
     </div>
