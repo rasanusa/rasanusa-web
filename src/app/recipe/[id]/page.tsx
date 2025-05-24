@@ -2,7 +2,6 @@ import { HydrateClient } from "@/trpc/server";
 import { type Metadata } from "next";
 import RecipeDetailContent from "./_components/RecipeDetailContent";
 import { Suspense } from "react";
-import type { NextPage } from "next";
 
 function RecipeLoading() {
   return (
@@ -20,10 +19,12 @@ export const metadata: Metadata = {
   description: "View detailed recipe information",
 };
 
-const RecipeDetailPage: NextPage<{
-  params: { id: string };
-}> = ({ params }) => {
-  const id = params.id;
+interface RecipeDetailPageProps {
+  params: Promise<{ id: string }>;
+}
+
+const RecipeDetailPage = async ({ params }: RecipeDetailPageProps) => {
+  const { id } = await params;
 
   return (
     <HydrateClient>
