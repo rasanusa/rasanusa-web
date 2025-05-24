@@ -166,7 +166,7 @@ Setelah melakukan pencarian, Anda akan melihat:
 
 - **Deskripsi singkat** tentang makanan yang Anda cari (dihasilkan oleh AI)
 - **Daftar resep** yang sesuai dengan query pencarian Anda
-- **Filter dan sorting** untuk mempersempit hasil pencarian
+- **Filter** untuk mempersempit hasil pencarian
 
 ### 4. 📖 Memilih Resep
 
