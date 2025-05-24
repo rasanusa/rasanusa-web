@@ -83,7 +83,7 @@ export const searchRouter = createTRPCRouter({
         const response = await axios.post(
           "https://api-inference.huggingface.co/models/meta-llama/Llama-3.1-8B-Instruct",
           {
-            inputs: `Write a brief, appetizing description (2-3 sentences) about "${input.query}" in Indonesian cuisine. Focus on what makes it special, its flavors, or cultural significance.
+            inputs: `Write a brief, appetizing description (2-3 sentences) about "${input.query}" in Indonesian cuisine. Focus on what makes it special, its flavors, or cultural significance. Ensure that the response doesnt exceeds 80 max new tokens.
 
 Query: ${input.query}
 
@@ -137,12 +137,12 @@ Description:`,
         const response = await axios.post(
           "https://api-inference.huggingface.co/models/meta-llama/Llama-3.1-8B-Instruct",
           {
-            inputs: `Create a brief, appetizing summary (2-3 sentences) for this Indonesian recipe:
+            inputs: `Create a brief, appetizing summary (2-3 sentences) for this Indonesian recipe (ensure that the response doesnt exceeds 80 max new tokens):
 
 Title: ${input.title}
 Category: ${input.category}
-Ingredients: ${input.ingredients.substring(0, 200)}...
-Steps: ${input.steps.substring(0, 200)}...
+Ingredients: ${input.ingredients.substring(0, 400)}...
+Steps: ${input.steps.substring(0, 500)}...
 
 Summary:`,
             parameters: {
@@ -191,11 +191,11 @@ Summary:`,
         const response = await axios.post(
           `https://api-inference.huggingface.co/models/${process.env.LANGUAGE_MODEL}`,
           {
-            inputs: `Provide 1-2 helpful cooking tips for this Indonesian recipe:
+            inputs: `Provide 1-2 helpful cooking tips for this Indonesian recipe (ensure that the response doesnt exceeds 60 max new tokens):
 
 Recipe: ${input.title}
 Category: ${input.category}
-Key ingredients: ${input.ingredients.substring(0, 150)}
+Key ingredients: ${input.ingredients.substring(0, 250)}
 
 Tips:`,
             parameters: {

@@ -2,6 +2,7 @@ import { HydrateClient } from "@/trpc/server";
 import { type Metadata } from "next";
 import RecipeDetailContent from "./_components/RecipeDetailContent";
 import { Suspense } from "react";
+import type { NextPage } from "next";
 
 function RecipeLoading() {
   return (
@@ -19,20 +20,18 @@ export const metadata: Metadata = {
   description: "View detailed recipe information",
 };
 
-interface RecipeDetailPageProps {
-  params: {
-    slug: string; // This is now the document ID
-  };
-}
-
-export default function RecipeDetailPage({ params }: RecipeDetailPageProps) {
-  const recipeId = params.slug; // The slug is actually the document ID
+const RecipeDetailPage: NextPage<{
+  params: { id: string };
+}> = ({ params }) => {
+  const id = params.id;
 
   return (
     <HydrateClient>
       <Suspense fallback={<RecipeLoading />}>
-        <RecipeDetailContent recipeId={recipeId} />
+        <RecipeDetailContent recipeId={id} />
       </Suspense>
     </HydrateClient>
   );
-}
+};
+
+export default RecipeDetailPage;
