@@ -447,6 +447,21 @@ English Translation:`,
           });
         }
 
+        // Determine sorting strategy based on whether there's a search query
+        let sortConfig;
+        if (query.trim()) {
+          // For search queries: prioritize relevance, then popularity
+          sortConfig = [
+            "_score",
+            { loves: { order: "desc" } }
+          ];
+        } else {
+          // For browsing (no query): sort by popularity only
+          sortConfig = [
+            { loves: { order: "desc" } }
+          ];
+        }
+
         const searchBody = {
           from: (page - 1) * limit,
           size: limit,
@@ -455,7 +470,7 @@ English Translation:`,
               must: mustQueries,
             },
           },
-          sort: [{ loves: { order: "desc" } }, "_score"],
+          sort: sortConfig,
         };
 
         const httpsAgent = new https.Agent({
